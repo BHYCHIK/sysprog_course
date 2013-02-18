@@ -8,7 +8,8 @@ ifneq ($(KERNELRELEASE),)
 	obj-m += stackwatch.o
 	stackwatch-objs := main.o
 else
-all:
+all: main.o
+main.o: moduleInfo.h
 	$(MAKE) -C $(KERNELDIR) M="$(PWD)" modules
 clean:
 	rm -rf *.o *.order *mod.c *.symvers
