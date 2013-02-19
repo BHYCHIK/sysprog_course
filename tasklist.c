@@ -6,7 +6,12 @@ struct listOfObservedProcesses
 	struct list_head list;
 };
 
-LIST_HEAD(observedProcesses);
+static struct list_head observedProcesses;
+
+void taskListInit(void)
+{
+	INIT_LIST_HEAD(&observedProcesses);
+}
 
 void startObserving(pid_t pid)
 {

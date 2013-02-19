@@ -8,6 +8,7 @@
 static int __init start(void)
 {
 	printk(KERN_ALERT "stackwatch started\n");
+	taskListInit();
 	return 0;
 }
 

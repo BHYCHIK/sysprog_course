@@ -7,6 +7,7 @@
 #define ProccessIsWatched 1
 #define ProccessIsNotWatched 0
 
+void taskListInit(void);
 void startObserving(pid_t pid);
 int isObserved(pid_t pid);
 void stopObserving(pid_t pid);
