@@ -3,6 +3,7 @@
 
 #include <linux/list.h>
 #include <linux/slab.h>
+#include <linux/rwsem.h>
 
 #define ProccessIsWatched 1
 #define ProccessIsNotWatched 0
