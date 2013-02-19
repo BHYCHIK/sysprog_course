@@ -10,6 +10,6 @@
 void startObserving(pid_t pid);
 int isObserved(pid_t pid);
 void stopObserving(pid_t pid);
-void deleteList(void);
+void deleteTaskList(void);
 
 #endif

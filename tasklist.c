@@ -29,7 +29,7 @@ int isObserved(pid_t pid)
 	return ProccessIsNotWatched;
 }
 
-void deleteList(void)
+void deleteTaskList(void)
 {
 	struct list_head *pos, *q;
 	struct listOfObservedProcesses* tmp;
