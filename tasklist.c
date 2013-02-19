@@ -21,7 +21,7 @@ int isObserved(pid_t pid)
 	struct listOfObservedProcesses* entry;
 	list_for_each_entry(entry, &observedProcesses, list)
 	{
-		if(entry->observedPid)
+		if(entry->observedPid == pid)
 		{
 			return ProccessIsWatched;
 		}
