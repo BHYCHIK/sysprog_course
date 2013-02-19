@@ -6,10 +6,9 @@ EXTRA_CFLAGS = -Wall -Werror
 
 ifneq ($(KERNELRELEASE),)
 	obj-m += stackwatch.o
-	stackwatch-objs := main.o
+	stackwatch-objs := main.o tasklist.o
 else
-all: main.o
-main.o: moduleInfo.h
+all:
 	$(MAKE) -C $(KERNELDIR) M="$(PWD)" modules
 clean:
 	rm -rf *.o *.order *mod.c *.symvers
