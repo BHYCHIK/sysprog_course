@@ -3,6 +3,7 @@
 #include <linux/init.h>
 
 #include "moduleInfo.h"
+#include "tasklist.h"
 
 static int __init start(void)
 {
@@ -12,6 +13,7 @@ static int __init start(void)
 
 static void __exit stop(void)
 {
+	deleteTaskList();
 	printk(KERN_ALERT "stackwatch stopped\n");
 }
 
