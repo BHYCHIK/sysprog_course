@@ -24,7 +24,7 @@ void startObserving(pid_t pid)
 	struct listOfObservedProcesses* newMemberOfList = (struct listOfObservedProcesses*)
 		kmalloc(sizeof(struct listOfObservedProcesses), GFP_KERNEL);
 	newMemberOfList->observedPid = pid;
-	down_read(&tasklistProtectionSem);
+	down_write(&tasklistProtectionSem);
 	list_for_each_entry(entry, &observedProcesses, list)
 	{
 		if(entry->observedPid == pid)
