@@ -5,17 +5,20 @@
 #include "moduleInfo.h"
 #include "tasklist.h"
 #include "input.h"
+#include "pfhandler.h"
 
 static int __init start(void)
 {
 	printk(KERN_INFO "STACKWATCH: started\n");
 	initProcfs();
 	taskListInit();
+	initPfHandler();
 	return 0;
 }
 
 static void __exit stop(void)
 {
+	unloadPfHandler();
 	unloadProcfs();
 	deleteTaskList();
 	printk(KERN_INFO "STACKWATCH: stopped\n");
