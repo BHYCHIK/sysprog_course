@@ -13,29 +13,12 @@
 #include <linux/perf_event.h>		/* perf_sw_event		*/
 #include <linux/hugetlb.h>		/* hstate_index_to_shift	*/
 #include <linux/prefetch.h>		/* prefetchw			*/
+#include <linux/pfhook.h>       /* BHYCHIK: for hooks    */
 
 #include <asm/traps.h>			/* dotraplinkage, ...		*/
 #include <asm/pgalloc.h>		/* pgd_*(), ...			*/
 #include <asm/kmemcheck.h>		/* kmemcheck_*(), ...		*/
 #include <asm/fixmap.h>			/* VSYSCALL_START		*/
-
-/*
- * Page fault error code bits:
- *
- *   bit 0 ==	 0: no page found	1: protection fault
- *   bit 1 ==	 0: read access		1: write access
- *   bit 2 ==	 0: kernel-mode access	1: user-mode access
- *   bit 3 ==				1: use of reserved bit detected
- *   bit 4 ==				1: fault was an instruction fetch
- */
-enum x86_pf_error_code {
-
-	PF_PROT		=		1 << 0,
-	PF_WRITE	=		1 << 1,
-	PF_USER		=		1 << 2,
-	PF_RSVD		=		1 << 3,
-	PF_INSTR	=		1 << 4,
-};
 
 /*
  * Returns 0 if mmiotrace is disabled, or if the fault is not
@@ -1000,6 +983,32 @@ static int fault_in_kernel_space(unsigned long address)
  * and the problem, and then passes it off to one of the appropriate
  * routines.
  */
+static pfhook_t pfhook = NULL;
+static struct rw_semaphore hookProtection;
+static char semInited = 0;
+
+pfhook_t setPfHook(pfhook_t newPfHook)
+{
+	pfhook_t previousHook;
+	
+	if(semInited == 0)
+	{
+		semInited = 1;
+		init_rwsem(&hookProtection);		
+	}
+	
+	down_write(&hookProtection);
+	if(pfhook != NULL)
+	{
+		previousHook = pfhook;
+		pfhook = newPfHook;
+	}
+	up_write(&hookProtection);
+	
+	return previousHook;
+}
+EXPORT_SYMBOL_GPL(setPfHook);
+
 dotraplinkage void __kprobes
 do_page_fault(struct pt_regs *regs, unsigned long error_code)
 {
@@ -1017,6 +1026,20 @@ do_page_fault(struct pt_regs *regs, unsigned long error_code)
 
 	/* Get the faulting address: */
 	address = read_cr2();
+	
+	//BHYCHIK: init rwsem to protect against race-condition
+	if(semInited == 0)
+	{
+		semInited = 1;
+		init_rwsem(&hookProtection);		
+	}
+	
+	down_read(&hookProtection);
+	if(pfhook != NULL)
+	{
+		pfhook(address, error_code);
+	}
+	up_read(&hookProtection);
 
 	/*
 	 * Detect and handle instructions that would cause a page fault for
