@@ -4,16 +4,19 @@
 
 #include "moduleInfo.h"
 #include "tasklist.h"
+#include "input.h"
 
 static int __init start(void)
 {
 	printk(KERN_ALERT "stackwatch started\n");
+	initProcfs();
 	taskListInit();
 	return 0;
 }
 
 static void __exit stop(void)
 {
+	unloadProcfs();
 	deleteTaskList();
 	printk(KERN_ALERT "stackwatch stopped\n");
 }

@@ -6,7 +6,7 @@ EXTRA_CFLAGS = -Wall -Werror
 
 ifneq ($(KERNELRELEASE),)
 	obj-m += stackwatch.o
-	stackwatch-objs := main.o tasklist.o
+	stackwatch-objs := main.o tasklist.o input.o
 else
 all:
 	$(MAKE) -C $(KERNELDIR) M="$(PWD)" modules
