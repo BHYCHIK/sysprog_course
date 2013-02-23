@@ -11,6 +11,6 @@ else
 all:
 	$(MAKE) -C $(KERNELDIR) M="$(PWD)" modules
 clean:
-	rm -rf *.o *.order *mod.c *.symvers
+	rm -rf *.o *.order *mod.c *.symvers .*.cmd
 endif
 	

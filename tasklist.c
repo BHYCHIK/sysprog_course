@@ -19,11 +19,24 @@ void taskListInit(void)
 
 void startObserving(pid_t pid)
 {
+	int mustBeWritten = 1;
+	struct listOfObservedProcesses* entry;
 	struct listOfObservedProcesses* newMemberOfList = (struct listOfObservedProcesses*)
 		kmalloc(sizeof(struct listOfObservedProcesses), GFP_KERNEL);
 	newMemberOfList->observedPid = pid;
-	down_write(&tasklistProtectionSem);
-	list_add(&newMemberOfList->list, &observedProcesses);
+	down_read(&tasklistProtectionSem);
+	list_for_each_entry(entry, &observedProcesses, list)
+	{
+		if(entry->observedPid == pid)
+		{
+			mustBeWritten = 0;
+		}
+	}
+	if(mustBeWritten)
+	{
+		list_add(&newMemberOfList->list, &observedProcesses);
+		printk(KERN_INFO "STACKWATCH: %d will be observed\n", pid);
+	}
 	up_write(&tasklistProtectionSem);
 }
 
@@ -72,6 +85,7 @@ void stopObserving(pid_t pid)
 			list_del(pos);
 			kfree(tmp);
 			up_write(&tasklistProtectionSem);
+			printk(KERN_INFO "STACKWATCH: %d will not be observed\n", pid);
 			return;
 		}
 	}
