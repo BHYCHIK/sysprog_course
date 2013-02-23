@@ -998,11 +998,8 @@ pfhook_t setPfHook(pfhook_t newPfHook)
 	}
 	
 	down_write(&hookProtection);
-	if(pfhook != NULL)
-	{
-		previousHook = pfhook;
-		pfhook = newPfHook;
-	}
+	previousHook = pfhook;
+	pfhook = newPfHook;
 	up_write(&hookProtection);
 	
 	return previousHook;
