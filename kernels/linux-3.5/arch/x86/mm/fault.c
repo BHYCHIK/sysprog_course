@@ -985,16 +985,15 @@ static int fault_in_kernel_space(unsigned long address)
  */
 static pfhook_t pfhook = NULL;
 static struct rw_semaphore hookProtection;
-static char semInited = 0;
+static volatile int semInited;
 
 pfhook_t setPfHook(pfhook_t newPfHook)
 {
 	pfhook_t previousHook;
 	
-	if(semInited == 0)
+	if(!test_and_set_bit(0, &semInited))
 	{
-		semInited = 1;
-		init_rwsem(&hookProtection);		
+		init_rwsem(&hookProtection);
 	}
 	
 	down_write(&hookProtection);
@@ -1025,9 +1024,8 @@ do_page_fault(struct pt_regs *regs, unsigned long error_code)
 	address = read_cr2();
 	
 	//BHYCHIK: init rwsem to protect against race-condition
-	if(semInited == 0)
+	if(!test_and_set_bit(0, &semInited))
 	{
-		semInited = 1;
 		init_rwsem(&hookProtection);		
 	}
 	
